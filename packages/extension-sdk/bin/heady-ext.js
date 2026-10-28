@@ -99,17 +99,26 @@ async function pack(directory, output) {
 }
 
 async function main() {
-    const [command, positional, ...rest] = process.argv.slice(2);
-    const args = [positional, ...rest].filter(Boolean);
+    const argv = process.argv.slice(2);
+    const command = argv.shift();
+    const positionalArgs = [];
+    for (let i = 0; i < argv.length; i++) {
+        if (['--id', '--out'].includes(argv[i])) {
+            i++;
+            continue;
+        }
+        if (!argv[i].startsWith('--')) positionalArgs.push(argv[i]);
+    }
+    const positional = positionalArgs[0];
     if (!command || command === 'help' || command === '--help') return usage();
-    if (command === 'init') return init(positional || 'my-extension', rest);
+    if (command === 'init') return init(positional || 'my-extension', argv);
     const directory = positional || '.';
     if (command === 'validate') {
         const manifest = await readManifest(directory);
         console.log(`Valid manifest: ${manifest.id}@${manifest.version} (API ${manifest.apiVersion})`);
         return;
     }
-    if (command === 'pack') return pack(directory, option(rest, '--out', undefined));
+    if (command === 'pack') return pack(directory, option(argv, '--out', undefined));
     usage();
     process.exitCode = 2;
 }
