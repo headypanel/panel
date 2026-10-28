@@ -5,7 +5,9 @@
 FROM --platform=$BUILDPLATFORM node:22-alpine
 WORKDIR /app
 COPY . ./
-RUN yarn install --frozen-lockfile \
+# The production clean script expects this directory to exist in a fresh checkout.
+RUN mkdir -p public/assets \
+    && yarn install --frozen-lockfile \
     && yarn run build:production
 
 # Stage 1:
