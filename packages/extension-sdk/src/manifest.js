@@ -33,7 +33,7 @@ export function validateManifest(value) {
         value.permissions.some((permission) => typeof permission !== 'string' || !/^[a-z][a-z0-9:._-]{1,63}$/.test(permission)))) {
         errors.push('permissions must be an array of permission identifiers.');
     }
-    if (value.entry !== undefined && (value.entry.startsWith('/') || value.entry.includes('\\') ||
+    if (typeof value.entry === 'string' && (value.entry.startsWith('/') || value.entry.includes('\\\\') ||
         value.entry.split('/').some((part) => part === '..' || part === '.'))) {
         errors.push('entry must be a safe relative path.');
     }
