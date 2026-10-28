@@ -1,0 +1,26 @@
+name: Extension SDK
+
+on:
+  push:
+    paths:
+      - "packages/extension-sdk/**"
+      - ".github/workflows/extension-sdk.yml"
+  pull_request:
+    paths:
+      - "packages/extension-sdk/**"
+      - ".github/workflows/extension-sdk.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/extension-sdk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --ignore-scripts
+      - run: npm run check
+      - run: npm test
