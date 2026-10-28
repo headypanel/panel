@@ -80,6 +80,9 @@ jobs:
           bash -n headypanel-install.sh
           grep -Fq "RELEASE_VERSION=\"$VERSION\"" headypanel-install.sh
           grep -Fq "REPOSITORY=\"$REPOSITORY\"" headypanel-install.sh
+          ! grep -Fq "__VERSION__" headypanel-install.sh
+          ! grep -Fq "__REPOSITORY__" headypanel-install.sh
+          grep -Fq '/releases/download/${RELEASE_VERSION}/panel.tar.gz' headypanel-install.sh
 
       - name: Extract release changelog
         env:
