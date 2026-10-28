@@ -90,7 +90,7 @@ async function pack(directory, output) {
             archive.pipe(outputStream);
             archive.file(path.join(directory, MANIFEST_FILE), { name: MANIFEST_FILE });
             for (const item of ['README.md', 'LICENSE', 'dist']) {
-                archive.file(path.join(directory, item), { name: item });
+                if (item === 'dist') archive.directory(path.join(directory, item), item);\n                else archive.file(path.join(directory, item), { name: item });
             }
             archive.finalize();
         });
