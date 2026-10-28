@@ -99,6 +99,8 @@ COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-
 php artisan key:generate --force
 php artisan migrate --seed --force
 php artisan storage:link || true
+log "Create the first panel administrator."
+php artisan p:user:make
 
 log "Applying least-privilege file permissions."
 chown -R root:"$SERVICE_USER" "$INSTALL_DIR"
