@@ -8,7 +8,6 @@
 # VCS and local tooling
 .git
 .gitignore
-.github
 .idea
 .vscode
 
