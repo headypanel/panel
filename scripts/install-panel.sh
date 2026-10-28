@@ -13,7 +13,7 @@ log() { printf '\n[HeadyPanel] %s\n' "$*"; }
 fail() { printf '\n[ERROR] %s\n' "$*" >&2; exit 1; }
 
 [[ $EUID -eq 0 ]] || fail "Run with sudo/root: bash headypanel-install.sh"
-[[ -t 0 ]] || fail "An interactive terminal is required."
+[[ -r /dev/tty ]] || fail "An interactive terminal is required (no /dev/tty available)."
 [[ "$RELEASE_VERSION" != "__VERSION__" && "$REPOSITORY" != "__REPOSITORY__" ]] || fail "This installer was not generated for a release."
 [[ "$RELEASE_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || fail "Invalid release version."
 
@@ -26,15 +26,15 @@ esac
 
 log "Installing HeadyPanel ${RELEASE_VERSION} on ${PRETTY_NAME}."
 printf 'Install directory [%s]: ' "$INSTALL_DIR"
-read -r input_dir
+read -r input_dir </dev/tty
 if [[ -n "$input_dir" ]]; then INSTALL_DIR="$input_dir"; fi
 [[ "$INSTALL_DIR" == /* && "$INSTALL_DIR" != "/" ]] || fail "Install directory must be an absolute path."
 [[ ! -e "$INSTALL_DIR" || -z "$(find "$INSTALL_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]] || fail "$INSTALL_DIR is not empty; choose an empty directory or back it up first."
 printf 'Public domain or IPv4 address (e.g. panel.example.com): '
-read -r PANEL_HOST
+read -r PANEL_HOST </dev/tty
 [[ "$PANEL_HOST" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]] || fail "Invalid host name."
 printf 'Email for optional Let’s Encrypt HTTPS (leave empty for HTTP): '
-read -r TLS_EMAIL
+read -r TLS_EMAIL </dev/tty
 [[ -z "$TLS_EMAIL" || "$TLS_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] || fail "Invalid email address."
 if [[ -n "$TLS_EMAIL" && "$PANEL_HOST" =~ ^[0-9.]+$ ]]; then fail "Let’s Encrypt requires a domain name, not an IP address."; fi
 
