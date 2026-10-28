@@ -2,9 +2,9 @@ name: PHP security checks
 
 on:
   push:
-    branches: [ "1.0-develop", "security/**" ]
+    branches: ["1.0-develop", "feature/release-installer", "security/**"]
   pull_request:
-    branches: [ "1.0-develop" ]
+    branches: ["1.0-develop"]
   schedule:
     - cron: "23 4 * * 1"
   workflow_dispatch:
@@ -13,30 +13,49 @@ permissions:
   contents: read
 
 jobs:
-  composer-audit:
+  dependency-audit:
     name: Composer dependency audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up PHP
+      - name: Set up supported PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.3"
+          extensions: bcmath, curl, gd, intl, mbstring, mysql, openssl, pdo, tokenizer, xml, zip
           tools: composer:v2
           coverage: none
       - name: Validate Composer metadata
         run: composer validate --no-check-publish
       - name: Audit locked dependencies
         run: composer audit --locked --no-dev
+
+  runtime-check:
+    name: Runtime platform and installer checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up supported PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: bcmath, curl, gd, intl, mbstring, mysql, openssl, pdo, tokenizer, xml, zip
+          tools: composer:v2
+          coverage: none
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress
       - name: Check runtime platform requirements
         run: composer check-platform-reqs --no-dev
+      - name: Verify installer shell syntax
+        run: bash -n scripts/install-panel.sh
 
   docker-build:
-    name: Build hardened PHP image
-    runs-on: ubuntu-latest
+    name: Build panel Docker image
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build --pull --tag headypanel-panel:security .
+        run: docker build --pull --tag headypanel-panel:ci .
