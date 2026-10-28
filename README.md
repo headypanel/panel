@@ -34,6 +34,10 @@ Development happens on the [`2.0-develop`](https://github.com/pterodactyl/panel/
 
 ![Image](https://cdn.pterodactyl.io/site-assets/pterodactyl_v1_demo.gif)
 
+## HeadyPanel installation
+
+Download the generated `headypanel-install.sh` asset from a published [GitHub release](https://github.com/headypanel/panel/releases), then run it on a fresh Debian 12 or Ubuntu 24.04 server. See the [release installer guide](docs/installation/release-installer.md) for supported systems and requirements.
+
 ## Documentation
 
 * [Panel Documentation](https://pterodactyl.io/panel/1.0/getting_started.html)
