@@ -1,0 +1,21 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# VCS and local tooling
+.git
+.gitignore
+.idea
+.vscode
+
+# Dependencies and build outputs (installed/built in the image)
+node_modules
+vendor
+public/assets
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
