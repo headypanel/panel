@@ -226,3 +226,19 @@ Route::group(['prefix' => 'nests'], function () {
     Route::delete('/egg/{egg:id}', [Admin\Nests\EggController::class, 'destroy']);
     Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| HeadyPanel Extension Manager
+|--------------------------------------------------------------------------
+|
+| Extension packages are stored as inert artifacts. Uploading or enabling a
+| package does not execute its code.
+|
+*/
+Route::group(['prefix' => 'extensions'], function () {
+    Route::get('/', [Admin\ExtensionsController::class, 'index'])->name('admin.extensions');
+    Route::post('/', [Admin\ExtensionsController::class, 'store'])->name('admin.extensions.store');
+    Route::post('/{id}/toggle', [Admin\ExtensionsController::class, 'toggle'])->name('admin.extensions.toggle');
+    Route::delete('/{id}', [Admin\ExtensionsController::class, 'destroy'])->name('admin.extensions.destroy');
+});
