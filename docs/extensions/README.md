@@ -13,6 +13,8 @@ The HeadyPanel Extension SDK defines a versioned package format and development 
 - [Security model](security.md)
 - [Compatibility and versioning](versioning.md)
 - [Example extension](examples/hello-extension/README.md)
+- [SDK runtime roadmap](runtime-roadmap.md)
+- [Standalone SDK package and CLI](../../packages/extension-sdk/README.md)
 
 ## Design goals
 
