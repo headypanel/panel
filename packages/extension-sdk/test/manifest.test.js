@@ -22,7 +22,7 @@ test('rejects unsupported API versions and traversal entrypoints', () => {
     assert.equal(validateManifest({ ...valid, entry: '../outside.js' }).valid, false);
 });
 
-test('rejects invalid permissions', () => {
+test('rejects non-string entrypoints without throwing', () => {\n    const result = validateManifest({ ...valid, entry: 42 });\n    assert.equal(result.valid, false);\n    assert.ok(result.errors.some((error) => error.includes('entry must be a string')));\n});\n\ntest('rejects invalid permissions', () => {
     assert.equal(validateManifest({ ...valid, permissions: ['*'] }).valid, false);
 });
 
