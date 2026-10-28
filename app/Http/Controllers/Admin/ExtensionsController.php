@@ -52,6 +52,11 @@ class ExtensionsController extends Controller
                 return back()->withErrors(['package' => 'The package must contain between 1 and 500 files.']);
             }
 
+            $manifestStat = $archive->statName('heady-extension.json');
+            if ($manifestStat === false || ($manifestStat['size'] ?? PHP_INT_MAX) > 65536) {
+                return back()->withErrors(['package' => 'Missing manifest at archive root or manifest exceeds 64 KiB.']);
+            }
+
             $manifestContent = $archive->getFromName('heady-extension.json');
             if ($manifestContent === false) {
                 return back()->withErrors(['package' => 'Missing heady-extension.json at the archive root.']);
