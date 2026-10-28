@@ -13,13 +13,12 @@ permissions:
   contents: read
 
 jobs:
-  composer-audit:
+  dependency-audit:
     name: Composer dependency audit
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up supported PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -27,19 +26,28 @@ jobs:
           extensions: bcmath, curl, gd, intl, mbstring, mysql, openssl, pdo, tokenizer, xml, zip
           tools: composer:v2
           coverage: none
-
       - name: Validate Composer metadata
         run: composer validate --no-check-publish
-
       - name: Audit locked dependencies
         run: composer audit --locked --no-dev
 
+  runtime-check:
+    name: Runtime platform and installer checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up supported PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: bcmath, curl, gd, intl, mbstring, mysql, openssl, pdo, tokenizer, xml, zip
+          tools: composer:v2
+          coverage: none
       - name: Install production dependencies
         run: composer install --no-dev --prefer-dist --no-interaction --no-progress
-
       - name: Check runtime platform requirements
         run: composer check-platform-reqs --no-dev
-
       - name: Verify installer shell syntax
         run: bash -n scripts/install-panel.sh
 
