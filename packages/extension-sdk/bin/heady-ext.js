@@ -75,7 +75,7 @@ async function init(directory, args) {
 
 async function pack(directory, output) {
     const manifest = await readManifest(directory);
-    const out = path.resolve(output || `${manifest.id}-${manifest.version}.zip`);
+    const out = path.resolve(output || path.join(directory, '..', `${manifest.id}-${manifest.version}.zip`));
     if (out.startsWith(path.resolve(directory) + path.sep)) throw new Error('Output ZIP must be outside the extension source directory.');
     await fs.mkdir(path.dirname(out), { recursive: true });
 
