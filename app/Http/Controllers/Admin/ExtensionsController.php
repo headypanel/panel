@@ -18,7 +18,7 @@ class ExtensionsController extends Controller
     public function index(): View
     {
         $disk = Storage::disk(self::DISK);
-        $extensions = collect($disk->files(self::DIRECTORY))
+        $extensions = collect($disk->allFiles(self::DIRECTORY))
             ->filter(fn (string $path) => str_ends_with($path, '/metadata.json'))
             ->map(function (string $path) use ($disk) {
                 try {
