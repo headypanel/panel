@@ -3,41 +3,77 @@ name: Refresh vulnerable Composer dependencies
 on:
   workflow_dispatch:
   push:
-    branches: [1.0-develop]
+    branches:
+      - 1.0-develop
     paths:
       - composer.json
+      - composer.lock
       - .github/workflows/refresh-composer-security.yml
 
 permissions:
   contents: write
+  pull-requests: write
+
+concurrency:
+  group: composer-security-refresh-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   refresh:
+    name: Update and audit Composer dependencies
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source branch
+        uses: actions/checkout@v4
         with:
           ref: 1.0-develop
-      - uses: shivammathur/setup-php@v2
+          fetch-depth: 0
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
           coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
       - name: Update vulnerable dependencies
-        run: |
-          composer update laravel/framework league/commonmark league/flysystem phpseclib/phpseclib symfony/http-foundation symfony/yaml --with-all-dependencies --no-interaction
-      - name: Validate lockfile and audit dependencies
-        run: |
-          composer validate --no-check-publish
-          composer audit --locked --no-dev
-      - name: Commit updated lockfile
-        run: |
-          if git diff --quiet -- composer.lock; then
-            echo "No lockfile changes."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add composer.lock
-          git commit -m "fix: update vulnerable Composer dependencies [skip ci]"
-          git push origin HEAD:1.0-develop
+        run: >-
+          composer update
+          laravel/framework
+          league/commonmark
+          league/flysystem
+          phpseclib/phpseclib
+          symfony/http-foundation
+          symfony/yaml
+          --with-all-dependencies
+          --no-interaction
+          --prefer-dist
+
+      - name: Check platform requirements
+        run: composer check-platform-reqs --no-dev
+
+      - name: Audit production dependencies
+        run: composer audit --locked --no-dev
+
+      - name: Open pull request with updated lockfile
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bot/composer-security-refresh
+          delete-branch: true
+          commit-message: "fix: update vulnerable Composer dependencies"
+          title: "fix: update vulnerable Composer dependencies"
+          body: |
+            Automated security refresh of Composer dependencies.
+
+            Checks run before opening this pull request:
+            - composer validate --no-check-publish
+            - composer check-platform-reqs --no-dev
+            - composer audit --locked --no-dev
+
+            Please review the lockfile diff and CI results before merging.
+          add-paths: composer.lock
